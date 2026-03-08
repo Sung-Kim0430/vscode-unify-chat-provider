@@ -3239,6 +3239,21 @@ const _WELL_KNOWN_MODELS = [
     },
   },
   {
+    id: 'gemini-3.1-flash-lite-preview',
+    overrides: ['gemini-3.1-flash-lite'],
+    name: 'Gemini 3.1 Flash Lite Preview',
+    maxInputTokens: 1048576,
+    maxOutputTokens: 65535,
+    stream: true,
+    thinking: {
+      type: 'enabled',
+    },
+    capabilities: {
+      toolCalling: true,
+      imageInput: true,
+    },
+  },
+  {
     id: 'gemini-3-pro-preview',
     overrides: ['gemini-3-pro'],
     name: 'Gemini 3 Pro Preview',
