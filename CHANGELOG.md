@@ -1,5 +1,28 @@
 # Changelog
 
+## v5.0.0 - 2026-03-08
+
+### Breaking Changes
+- accepts only globally scoped configurations (300a7a8, SmallMain)
+
+### Features
+- add GPT-5.4 model support (98769e5, SmallMain)
+- add Gemini 3.1 Flash Lite Preview model (3ce0c9d, SmallMain)
+- add Qwen 3.5 series tiny models (ad8bf86, SmallMain)
+- refactor to multi-window instance anti-concurrency strategy (7278bdb, SmallMain)
+- add Synthetic.new provider docs and balance checker (7983ac3, Matt Cowger)
+- add Synthetic.new well-known provider and models (afc9364, Matt Cowger)
+
+### Fixes
+- update formatting functions for model selection and enhance balance snapshot normalization (a8ab026, SmallMain)
+- update Synthetic provider translates and documentation (a62db6e, SmallMain)
+- google: merge streaming functionCall chunks to prevent empty name errors (ab8e96d, Matt Cowger)
+
+### Chores
+- update dependencies (070e527, SmallMain)
+- update CLI clients to sync with reference projects (a937c6c, SmallMain)
+- update vscode dts (259605b, SmallMain)
+
 ## v4.9.4 - 2026-02-26
 
 ### Fixes
