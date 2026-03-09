@@ -712,6 +712,24 @@
                             "%configuration.endpoints.models.verbosity.enumDescriptions.2%"
                           ]
                         },
+                        "serviceTier": {
+                          "type": "string",
+                          "description": "%configuration.endpoints.models.serviceTier.description%",
+                          "enum": [
+                            "auto",
+                            "standard",
+                            "flex",
+                            "scale",
+                            "priority"
+                          ],
+                          "enumDescriptions": [
+                            "%configuration.endpoints.models.serviceTier.enumDescriptions.0%",
+                            "%configuration.endpoints.models.serviceTier.enumDescriptions.1%",
+                            "%configuration.endpoints.models.serviceTier.enumDescriptions.2%",
+                            "%configuration.endpoints.models.serviceTier.enumDescriptions.3%",
+                            "%configuration.endpoints.models.serviceTier.enumDescriptions.4%"
+                          ]
+                        },
                         "thinking": {
                           "type": "object",
                           "description": "%configuration.endpoints.models.thinking.description%",

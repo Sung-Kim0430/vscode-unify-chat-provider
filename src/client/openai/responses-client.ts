@@ -37,6 +37,7 @@ import {
   mergeHeaders,
   parseToolArguments,
   processUsage as sharedProcessUsage,
+  resolveOpenAIServiceTier,
   setUserAgentHeader,
 } from '../utils';
 import * as vscode from 'vscode';
@@ -194,12 +195,15 @@ export class OpenAIResponsesProvider implements ApiProvider {
 
             if (markerParts.length === 1) {
               try {
-                const { data: raw, sessionId, responseId } =
-                  decodeStatefulMarkerPart<OpenAIResponsesMarkerData>(
-                    expectedIdentity,
-                    encodedModelId,
-                    markerParts[0],
-                  );
+                const {
+                  data: raw,
+                  sessionId,
+                  responseId,
+                } = decodeStatefulMarkerPart<OpenAIResponsesMarkerData>(
+                  expectedIdentity,
+                  encodedModelId,
+                  markerParts[0],
+                );
                 if (firstSessionId == null && sessionId) {
                   firstSessionId = sessionId;
                 }
@@ -616,11 +620,13 @@ export class OpenAIResponsesProvider implements ApiProvider {
       this.config,
       model,
     );
+    const serviceTier = resolveOpenAIServiceTier(this.config, model);
 
     const baseBody: ResponseCreateParamsBase = {
       model: getBaseModelId(model.id),
       input: convertedMessages,
       ...this.buildReasoningParams(model, useThinkingParam2),
+      ...(serviceTier !== undefined ? { service_tier: serviceTier } : {}),
       ...(model.verbosity ? { text: { verbosity: model.verbosity } } : {}),
       ...(model.maxOutputTokens !== undefined
         ? { max_output_tokens: model.maxOutputTokens }
@@ -668,7 +674,8 @@ export class OpenAIResponsesProvider implements ApiProvider {
 
     try {
       if (streamEnabled) {
-        const responseTimeoutMs = resolveChatNetwork(this.config).timeout.response;
+        const responseTimeoutMs = resolveChatNetwork(this.config).timeout
+          .response;
 
         const stream = await client.responses.create(
           { ...baseBody, stream: true },
