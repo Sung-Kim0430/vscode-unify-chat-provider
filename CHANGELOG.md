@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.2.1 - 2026-03-10
+
+### Fixes
+- add chatgpt.com to supported providers for OpenAIUsePreviousResponseId feature (315bc81, SmallMain)
+- only support previous_response_id continuation for compatible providers (aa782e7, SmallMain)
+
 ## v5.2.0 - 2026-03-10
 
 ### Features
