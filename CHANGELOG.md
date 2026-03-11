@@ -1,5 +1,13 @@
 # Changelog
 
+## v5.4.0 - 2026-03-11
+
+### Features
+- add service tier field to provider configuration (25db890, SmallMain)
+
+### Fixes
+- add response timeout support to custom fetch implementation (5159445, SmallMain)
+
 ## v5.3.0 - 2026-03-10
 
 ### Features
