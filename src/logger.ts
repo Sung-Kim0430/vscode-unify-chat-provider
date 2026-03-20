@@ -30,18 +30,10 @@ function getChannel(): vscode.LogOutputChannel {
 }
 
 function isVerboseEnabled(): boolean {
-  return readGlobalBooleanSetting('verbose', false);
-}
-
-function readGlobalBooleanSetting(key: string, fallback: boolean): boolean {
   const config = vscode.workspace.getConfiguration('unifyChatProvider');
-  const inspection = config.inspect<unknown>(key);
-  const value = inspection?.globalValue;
-  return typeof value === 'boolean' ? value : fallback;
-}
-
-export function isCodexEventStreamDebugEnabled(): boolean {
-  return readGlobalBooleanSetting('codexDebugEventStream', false);
+  const inspection = config.inspect<unknown>('verbose');
+  const verbose = inspection?.globalValue;
+  return typeof verbose === 'boolean' ? verbose : false;
 }
 
 function maskSensitiveHeaders(
@@ -337,8 +329,8 @@ export class RequestLogger implements ProviderHttpLogger {
   /**
    * Log verbose information. Only logged when verbose is enabled.
    */
-  verbose(message: string, force = false): void {
-    if (!force && !isVerboseEnabled()) {
+  verbose(message: string): void {
+    if (!isVerboseEnabled()) {
       return;
     }
     this.ch.info(`[${this.requestId}] ${message}`);

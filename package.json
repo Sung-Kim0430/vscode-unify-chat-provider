@@ -186,11 +186,6 @@
           "description": "%configuration.verbose.description%",
           "default": false
         },
-        "unifyChatProvider.codexDebugEventStream": {
-          "type": "boolean",
-          "description": "%configuration.codexDebugEventStream.description%",
-          "default": false
-        },
         "unifyChatProvider.storeApiKeyInSettings": {
           "type": "boolean",
           "description": "%configuration.storeApiKeyInSettings.description%",

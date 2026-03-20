@@ -5,7 +5,6 @@ import {
 } from 'vscode';
 import { createSimpleHttpLogger } from '../../logger';
 import type { ProviderHttpLogger, RequestLogger } from '../../logger';
-import { isCodexEventStreamDebugEnabled } from '../../logger';
 import { ThinkingBlockMetadata } from '../types';
 import { FeatureId } from '../definitions';
 import { ApiProvider } from '../interface';
@@ -875,8 +874,6 @@ export class OpenAIResponsesProvider implements ApiProvider {
   ): AsyncGenerator<vscode.LanguageModelResponsePart2> {
     let usage: ResponseUsage | undefined;
     const emittedFunctionCallIds = new Set<string>();
-    const codexEventStreamDebugEnabled =
-      this.config.type === 'openai-codex' && isCodexEventStreamDebugEnabled();
 
     const recordFirstToken = createFirstTokenRecorder(performanceTrace);
 
@@ -910,26 +907,6 @@ export class OpenAIResponsesProvider implements ApiProvider {
       }
 
       logger.providerResponseChunk(JSON.stringify(event));
-      if (codexEventStreamDebugEnabled) {
-        let extra = '';
-        switch (event.type) {
-          case 'response.output_item.added':
-          case 'response.output_item.done':
-            extra = ` item_type=${event.item.type}`;
-            if (event.item.type === 'function_call') {
-              extra += ` call_id=${event.item.call_id} tool=${event.item.name}`;
-            }
-            break;
-          case 'response.completed': {
-            const functionCallCount = event.response.output.filter(
-              (item) => item.type === 'function_call',
-            ).length;
-            extra = ` output_count=${event.response.output.length} function_call_count=${functionCallCount}`;
-            break;
-          }
-        }
-        logger.verbose(`[codex-debug] event=${event.type}${extra}`, true);
-      }
 
       recordFirstToken();
 
