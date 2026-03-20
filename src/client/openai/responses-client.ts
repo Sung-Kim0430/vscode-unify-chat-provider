@@ -39,6 +39,7 @@ import {
   getUnifiedUserAgent,
   isFeatureSupported,
   mergeHeaders,
+  normalizeToolInputSchema,
   parseToolArguments,
   processUsage as sharedProcessUsage,
   resolveOpenAIServiceTier,
@@ -628,11 +629,7 @@ export class OpenAIResponsesProvider implements ApiProvider {
       type: 'function',
       name: tool.name,
       description: tool.description,
-      parameters: (tool.inputSchema as Record<string, unknown>) ?? {
-        type: 'object',
-        properties: {},
-        required: [],
-      },
+      parameters: normalizeToolInputSchema(tool.inputSchema),
       strict: false,
     }));
   }

@@ -43,6 +43,7 @@ import {
   getToken,
   getTokenType,
   mergeHeaders,
+  normalizeToolInputSchema,
   processUsage as sharedProcessUsage,
 } from '../utils';
 
@@ -386,11 +387,8 @@ export class OllamaProvider implements ApiProvider {
       function: {
         name: tool.name,
         description: tool.description,
-        parameters: (tool.inputSchema as Tool['function']['parameters']) ?? {
-          type: 'object',
-          properties: {},
-          required: [],
-        },
+        parameters:
+          normalizeToolInputSchema(tool.inputSchema) as Tool['function']['parameters'],
       },
     }));
   }

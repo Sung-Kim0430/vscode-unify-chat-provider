@@ -39,6 +39,7 @@ import {
   isFeatureSupported,
   isFeatureSupportedByProvider,
   mergeHeaders,
+  normalizeToolInputSchema,
   parseToolArguments,
   processUsage as sharedProcessUsage,
   resolveOpenAIServiceTier,
@@ -516,11 +517,8 @@ export class OpenAIChatCompletionProvider implements ApiProvider {
           function: {
             name: tool.name,
             description: tool.description,
-            parameters: (tool.inputSchema ?? {
-              type: 'object',
-              properties: {},
-              required: [],
-            }) as FunctionParameters,
+            parameters:
+              normalizeToolInputSchema(tool.inputSchema) as FunctionParameters,
           },
         }) as ChatCompletionFunctionTool,
     );

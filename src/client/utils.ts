@@ -450,6 +450,118 @@ export function parseToolArguments(
   }
 }
 
+function isToolSchemaRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeToolSchemaType(value: unknown): string | undefined {
+  const normalize = (input: string): string | undefined => {
+    const trimmed = input.trim().toLowerCase();
+    return trimmed.length > 0 ? trimmed : undefined;
+  };
+
+  if (typeof value === 'string') {
+    return normalize(value);
+  }
+
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  for (const item of value) {
+    if (typeof item !== 'string') {
+      continue;
+    }
+
+    const normalized = normalize(item);
+    if (normalized && normalized !== 'null') {
+      return normalized;
+    }
+  }
+
+  return undefined;
+}
+
+function normalizeToolSchemaValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((item) => normalizeToolSchemaValue(item));
+  }
+
+  if (!isToolSchemaRecord(value)) {
+    return value;
+  }
+
+  const out: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) {
+    out[key] = normalizeToolSchemaValue(child);
+  }
+
+  const properties = out['properties'];
+  const items = out['items'];
+  const normalizedType = normalizeToolSchemaType(out['type']);
+
+  if (items !== undefined) {
+    out['type'] = 'array';
+  } else if (isToolSchemaRecord(properties)) {
+    out['type'] = 'object';
+  } else if (normalizedType !== undefined) {
+    out['type'] = normalizedType;
+  } else {
+    delete out['type'];
+  }
+
+  if (Array.isArray(out['required']) && isToolSchemaRecord(properties)) {
+    const propertyNames = new Set(Object.keys(properties));
+    const required = out['required'].filter(
+      (item): item is string =>
+        typeof item === 'string' && propertyNames.has(item),
+    );
+
+    if (required.length > 0) {
+      out['required'] = required;
+    } else {
+      delete out['required'];
+    }
+  } else if (out['required'] !== undefined) {
+    delete out['required'];
+  }
+
+  return out;
+}
+
+export function normalizeToolInputSchema(
+  schema: object | undefined,
+): Record<string, unknown> {
+  const normalized = normalizeToolSchemaValue(schema);
+  const out = isToolSchemaRecord(normalized) ? { ...normalized } : {};
+  const properties = isToolSchemaRecord(out['properties'])
+    ? { ...out['properties'] }
+    : {};
+  const requiredRaw = out['required'];
+
+  out['type'] = 'object';
+  out['properties'] = properties;
+  delete out['items'];
+
+  if (Array.isArray(requiredRaw)) {
+    const propertyNames = new Set(Object.keys(properties));
+    const required = requiredRaw.filter(
+      (item): item is string =>
+        typeof item === 'string' && propertyNames.has(item),
+    );
+
+    if (required.length > 0) {
+      out['required'] = required;
+    } else {
+      delete out['required'];
+    }
+  } else {
+    delete out['required'];
+  }
+
+  return out;
+}
+
 /**
  * Options for creating a custom fetch function.
  */

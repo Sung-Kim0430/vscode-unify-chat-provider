@@ -45,6 +45,7 @@ import {
   estimateTokenCount as sharedEstimateTokenCount,
   getToken,
   getUnifiedUserAgent,
+  normalizeToolInputSchema,
   mergeHeaders,
   processUsage as sharedProcessUsage,
   isFeatureSupported,
@@ -141,11 +142,7 @@ export class GoogleAIStudioProvider implements ApiProvider {
     const declarations: FunctionDeclaration[] = tools.map((tool) => ({
       name: tool.name,
       description: tool.description,
-      parametersJsonSchema: tool.inputSchema ?? {
-        type: 'object',
-        properties: {},
-        required: [],
-      },
+      parametersJsonSchema: normalizeToolInputSchema(tool.inputSchema),
     }));
 
     return [{ functionDeclarations: declarations }];
