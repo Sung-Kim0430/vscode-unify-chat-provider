@@ -110,7 +110,11 @@ async function requestDeviceCode(domain: string): Promise<DeviceCodeResponse> {
   if (!response.ok) {
     const text = await response.text();
     throw new Error(
-      t('Device authorization failed (HTTP {0}): {1}', `${response.status}`, text),
+      t(
+        'Device authorization failed (HTTP {0}): {1}',
+        `${response.status}`,
+        text,
+      ),
     );
   }
 
@@ -208,7 +212,9 @@ async function pollAccessTokenOnce(
 }
 
 export class GitHubCopilotAuthProvider implements AuthProvider {
-  static supportsSensitiveDataInSettings(_auth: GitHubCopilotAuthConfig): boolean {
+  static supportsSensitiveDataInSettings(
+    _auth: GitHubCopilotAuthConfig,
+  ): boolean {
     return false;
   }
 
@@ -498,6 +504,8 @@ export class GitHubCopilotAuthProvider implements AuthProvider {
         {
           title: t('Select GitHub deployment'),
           ignoreFocusOut: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
         },
       );
 

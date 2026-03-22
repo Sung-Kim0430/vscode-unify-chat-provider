@@ -44,8 +44,8 @@ export async function pickQuickItem<T extends vscode.QuickPickItem>(
   const qp = vscode.window.createQuickPick<T>();
   qp.title = config.title;
   qp.placeholder = config.placeholder;
-  qp.matchOnDescription = config.matchOnDescription ?? false;
-  qp.matchOnDetail = config.matchOnDetail ?? false;
+  qp.matchOnDescription = config.matchOnDescription ?? true;
+  qp.matchOnDetail = config.matchOnDetail ?? true;
   qp.ignoreFocusOut = config.ignoreFocusOut ?? false;
   qp.items = [...config.items];
 
@@ -286,9 +286,12 @@ export async function showInput(options: {
 
 export async function showValidationErrors(errors: string[]): Promise<void> {
   if (errors.length === 0) return;
-  await vscode.window.showErrorMessage(t('Please fix:\n{0}', errors.join('\n')), {
-    modal: true,
-  });
+  await vscode.window.showErrorMessage(
+    t('Please fix:\n{0}', errors.join('\n')),
+    {
+      modal: true,
+    },
+  );
 }
 
 /**

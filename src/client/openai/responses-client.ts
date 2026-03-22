@@ -1156,12 +1156,12 @@ export class OpenAIResponsesProvider implements ApiProvider {
       this.shouldIncludeResponseIdInMarker(baseBody);
     const httpContinuation =
       supportsPreviousResponseId && canUsePreviousResponseId
-      ? this.resolveResponseContinuation(
-          baseBody,
-          previousResponseId,
-          inputAfterPreviousResponse,
-        )
-      : undefined;
+        ? this.resolveResponseContinuation(
+            baseBody,
+            previousResponseId,
+            inputAfterPreviousResponse,
+          )
+        : undefined;
     if (
       supportsPreviousResponseId &&
       previousResponseId &&
@@ -1660,8 +1660,7 @@ export class OpenAIResponsesProvider implements ApiProvider {
     const prefix =
       state.lastType !== undefined && state.lastType !== type ? '\n' : '';
     const output =
-      prefix +
-      (type === 'encrypted' ? ENCRYPTED_THINKING_PLACEHOLDER : text);
+      prefix + (type === 'encrypted' ? ENCRYPTED_THINKING_PLACEHOLDER : text);
 
     if (emitMode !== 'metadata-only') {
       yield new vscode.LanguageModelThinkingPart(output);
@@ -1861,10 +1860,7 @@ export class OpenAIResponsesProvider implements ApiProvider {
             (v): v is ResponseReasoningItem => v.type === 'reasoning',
           );
 
-          yield* this.extractThinkingParts(
-            reasonings,
-            'metadata-only',
-          );
+          yield* this.extractThinkingParts(reasonings, 'metadata-only');
 
           const markerData: OpenAIResponsesMarkerData = {
             data: response.output,
@@ -1973,7 +1969,11 @@ export class OpenAIResponsesProvider implements ApiProvider {
         headers: this.buildHeaders(this.generateSessionId(), credential),
       });
       for await (const model of page) {
-        result.push({ id: model.id });
+        const name = model.name?.trim();
+        result.push({
+          id: model.id,
+          ...(name ? { name } : {}),
+        });
       }
       return result;
     } catch (error) {

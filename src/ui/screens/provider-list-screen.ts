@@ -15,10 +15,11 @@ import {
   promptForSensitiveDataInclusion,
 } from '../provider-ops';
 import { createProviderDraft } from '../form-utils';
-import { getAllModelsForProvider } from '../../utils';
+import { getAllModelsForProviderSync, isPlaceholderModelId } from '../../utils';
 import { deleteProviderApiKeySecretIfUnused } from '../../api-key-utils';
 import { resolveProvidersForExportOrShowError } from '../../auth/auth-transfer';
 import { balanceManager, formatSummaryLine } from '../../balance';
+import { officialModelsManager } from '../../official-models-manager';
 import { t } from '../../i18n';
 
 type ProviderListItem = vscode.QuickPickItem & {
@@ -42,7 +43,23 @@ export async function runProviderListScreen(
     title: t('Manage Providers'),
     placeholder: t('Select a provider to edit, or add a new one'),
     ignoreFocusOut: false,
-    items: await buildProviderListItems(ctx.store),
+    items: buildProviderListItems(ctx.store),
+    onExternalRefresh: (refreshItems) => {
+      const refresh = () => {
+        refreshItems(buildProviderListItems(ctx.store));
+      };
+
+      const officialModelsDisposable =
+        officialModelsManager.onDidUpdate(refresh);
+      const balanceDisposable = balanceManager.onDidUpdate(refresh);
+
+      refresh();
+
+      return new vscode.Disposable(() => {
+        officialModelsDisposable.dispose();
+        balanceDisposable.dispose();
+      });
+    },
     onDidTriggerItemButton: async (event, qp) => {
       const item = event.item;
       if (item.action !== 'provider' || !item.providerName) return;
@@ -57,7 +74,7 @@ export async function runProviderListScreen(
         const provider = ctx.store.getProvider(item.providerName);
         if (provider) {
           await duplicateProvider(ctx.store, ctx.secretStore, provider);
-          qp.items = await buildProviderListItems(ctx.store);
+          qp.items = buildProviderListItems(ctx.store);
         }
         return;
       }
@@ -75,7 +92,7 @@ export async function runProviderListScreen(
         });
         await ctx.store.removeProvider(item.providerName);
         showDeletedMessage(item.providerName, 'Provider');
-        qp.items = await buildProviderListItems(ctx.store);
+        qp.items = buildProviderListItems(ctx.store);
       }
 
       return;
@@ -194,9 +211,7 @@ export async function runProviderListScreen(
   return { kind: 'stay' };
 }
 
-async function buildProviderListItems(
-  store: UiContext['store'],
-): Promise<ProviderListItem[]> {
+function buildProviderListItems(store: UiContext['store']): ProviderListItem[] {
   const items: ProviderListItem[] = [
     {
       label: '$(add) ' + t('Add Provider...'),
@@ -222,17 +237,28 @@ async function buildProviderListItems(
 
   for (const provider of store.endpoints) {
     items.push({ label: '', kind: vscode.QuickPickItemKind.Separator });
-    const allModels = await getAllModelsForProvider(provider);
-    const modelList = allModels.map((m) => m.name || m.id).join(', ');
-    const modelDetail = modelList
-      ? t('Models: {0}', modelList)
-      : t('No models');
+    const allModels = getAllModelsForProviderSync(provider);
+    const visibleModels = allModels.filter(
+      (model) => !isPlaceholderModelId(model.id),
+    );
+    const isLoadingOfficialModels =
+      provider.autoFetchOfficialModels &&
+      allModels.length !== visibleModels.length;
+    const modelList = visibleModels.map((m) => m.name || m.id).join(', ');
     const balanceSummary = formatSummaryLine(
       balanceManager.getProviderState(provider.name)?.snapshot,
     );
-    const detailParts = [modelDetail];
+    const detailParts: string[] = [];
     if (balanceSummary) {
-      detailParts.unshift(balanceSummary);
+      detailParts.push(balanceSummary);
+    }
+    if (modelList) {
+      detailParts.push(t('Models: {0}', modelList));
+    } else if (!isLoadingOfficialModels) {
+      detailParts.push(t('No models'));
+    }
+    if (isLoadingOfficialModels) {
+      detailParts.push(t('Loading official models...'));
     }
 
     items.push({

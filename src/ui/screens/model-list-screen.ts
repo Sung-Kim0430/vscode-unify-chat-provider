@@ -111,7 +111,7 @@ export async function runModelListScreen(
       ? t('Provider: {0}', providerName)
       : t('Models ({0})', providerName);
   let didSave = false;
-  await updateOfficialModelsDataForRoute(route);
+  updateOfficialModelsDataForRoute(route);
 
   // Ensure we have a session ID for draft state management
   const sessionId = ensureRouteDraftSessionId(route);
@@ -123,7 +123,7 @@ export async function runModelListScreen(
     items: buildModelListItems(route, includeSave),
     onExternalRefresh: (refreshItems) => {
       // Subscribe to official models updates using session ID
-      return officialModelsManager.onDidUpdate((updatedId) => {
+      const disposable = officialModelsManager.onDidUpdate((updatedId) => {
         if (updatedId === sessionId) {
           const state = officialModelsManager.getDraftSessionState(sessionId);
           route.officialModelsData = {
@@ -133,6 +133,10 @@ export async function runModelListScreen(
           refreshItems(buildModelListItems(route, includeSave));
         }
       });
+
+      refreshItems(buildModelListItems(route, includeSave));
+
+      return disposable;
     },
     onInlineAction: async (item, qp) => {
       // Handle toggle-auto-fetch inline without closing the picker
@@ -677,9 +681,7 @@ function formatTimeAgo(date: Date): string {
   return t('just now');
 }
 
-async function updateOfficialModelsDataForRoute(
-  route: ModelListRoute,
-): Promise<void> {
+function updateOfficialModelsDataForRoute(route: ModelListRoute): void {
   if (!route.draft?.autoFetchOfficialModels) {
     route.officialModelsData = undefined;
     return;
@@ -697,11 +699,21 @@ async function updateOfficialModelsDataForRoute(
     );
   }
 
-  route.officialModelsData =
-    await officialModelsManager.getOfficialModelsForDraft(
-      sessionId,
-      draftInput,
-    );
+  const state = officialModelsManager.getDraftSessionState(sessionId);
+  route.officialModelsData = { models: state?.models ?? [], state };
+
+  void officialModelsManager
+    .getOfficialModelsForDraft(sessionId, draftInput)
+    .then((result) => {
+      route.officialModelsData = result;
+    })
+    .catch(() => {
+      const latestState = officialModelsManager.getDraftSessionState(sessionId);
+      route.officialModelsData = {
+        models: latestState?.models ?? [],
+        state: latestState,
+      };
+    });
 }
 
 function buildOfficialModelsDraftInput(

@@ -106,12 +106,16 @@ async function syncPersistedProvider(options: {
   }
 
   try {
-    await mainInstance.runInLeaderWhenAvailable('config.syncPersistedProvider', {
-      provider: options.provider,
-      ...(options.originalName && options.originalName !== options.provider.name
-        ? { originalName: options.originalName }
-        : {}),
-    });
+    await mainInstance.runInLeaderWhenAvailable(
+      'config.syncPersistedProvider',
+      {
+        provider: options.provider,
+        ...(options.originalName &&
+        options.originalName !== options.provider.name
+          ? { originalName: options.originalName }
+          : {}),
+      },
+    );
   } catch (error) {
     if (isLeaderUnavailableError(error) || isVersionIncompatibleError(error)) {
       return;
@@ -343,6 +347,8 @@ async function promptForProviderExportSections(): Promise<
     >();
     qp.title = t('Export Provider Configuration');
     qp.placeholder = t('Select what to export');
+    qp.matchOnDescription = true;
+    qp.matchOnDetail = true;
     qp.canSelectMany = true;
     qp.ignoreFocusOut = true;
     qp.items = [
@@ -416,6 +422,8 @@ export async function promptForSensitiveDataInclusion(): Promise<
     {
       placeHolder: t('Select export mode'),
       ignoreFocusOut: true,
+      matchOnDescription: true,
+      matchOnDetail: true,
     },
   );
 

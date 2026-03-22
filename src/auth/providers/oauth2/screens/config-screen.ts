@@ -44,6 +44,8 @@ export async function showOAuth2ConfigScreen(
   const grantTypeItem = await vscode.window.showQuickPick(GRANT_TYPE_OPTIONS, {
     title: t('OAuth 2.0 Configuration'),
     placeHolder: t('Select authorization type'),
+    matchOnDescription: true,
+    matchOnDetail: true,
   });
 
   if (!grantTypeItem) {
@@ -136,7 +138,9 @@ async function collectAuthCodeConfig(
     prompt: t('Enter OAuth scopes (space-separated, optional)'),
     placeHolder: 'openid profile email',
     ignoreFocusOut: true,
-    value: Array.isArray(initial?.scopes) ? initial.scopes.join(' ') : undefined,
+    value: Array.isArray(initial?.scopes)
+      ? initial.scopes.join(' ')
+      : undefined,
   });
 
   if (scopes === undefined) return undefined;
@@ -145,12 +149,18 @@ async function collectAuthCodeConfig(
   const initialPkce = typeof initial?.pkce === 'boolean' ? initial.pkce : true;
   const usePkce = await vscode.window.showQuickPick(
     [
-      { label: t('Yes (Recommended)'), value: true, picked: initialPkce === true },
+      {
+        label: t('Yes (Recommended)'),
+        value: true,
+        picked: initialPkce === true,
+      },
       { label: t('No'), value: false, picked: initialPkce === false },
     ],
     {
       title: t('Use PKCE?'),
       placeHolder: t('PKCE adds extra security for public clients'),
+      matchOnDescription: true,
+      matchOnDetail: true,
     },
   );
 
@@ -172,9 +182,7 @@ async function collectAuthCodeConfig(
  * Collect client credentials configuration
  */
 async function collectClientCredentialsConfig(
-  initial?: Partial<
-    Extract<OAuth2Config, { grantType: 'client_credentials' }>
-  >,
+  initial?: Partial<Extract<OAuth2Config, { grantType: 'client_credentials' }>>,
 ): Promise<OAuth2Config | undefined> {
   const tokenUrl = await vscode.window.showInputBox({
     title: t('Token URL'),
@@ -216,8 +224,12 @@ async function collectClientCredentialsConfig(
     prompt: t('Enter your OAuth client secret'),
     password: true,
     ignoreFocusOut: true,
-    validateInput: (text) => (text.trim() ? null : t('Client secret is required')),
-    value: typeof initial?.clientSecret === 'string' ? initial.clientSecret : undefined,
+    validateInput: (text) =>
+      text.trim() ? null : t('Client secret is required'),
+    value:
+      typeof initial?.clientSecret === 'string'
+        ? initial.clientSecret
+        : undefined,
   });
 
   if (!clientSecret) return undefined;
@@ -226,7 +238,9 @@ async function collectClientCredentialsConfig(
     title: t('Scopes'),
     prompt: t('Enter OAuth scopes (space-separated, optional)'),
     ignoreFocusOut: true,
-    value: Array.isArray(initial?.scopes) ? initial.scopes.join(' ') : undefined,
+    value: Array.isArray(initial?.scopes)
+      ? initial.scopes.join(' ')
+      : undefined,
   });
 
   if (scopes === undefined) return undefined;
@@ -300,7 +314,9 @@ async function collectDeviceCodeConfig(
     title: t('Scopes'),
     prompt: t('Enter OAuth scopes (space-separated, optional)'),
     ignoreFocusOut: true,
-    value: Array.isArray(initial?.scopes) ? initial.scopes.join(' ') : undefined,
+    value: Array.isArray(initial?.scopes)
+      ? initial.scopes.join(' ')
+      : undefined,
   });
 
   if (scopes === undefined) return undefined;

@@ -517,8 +517,9 @@ export class OpenAIChatCompletionProvider implements ApiProvider {
           function: {
             name: tool.name,
             description: tool.description,
-            parameters:
-              normalizeToolInputSchema(tool.inputSchema) as FunctionParameters,
+            parameters: normalizeToolInputSchema(
+              tool.inputSchema,
+            ) as FunctionParameters,
           },
         }) as ChatCompletionFunctionTool,
     );
@@ -975,9 +976,10 @@ export class OpenAIChatCompletionProvider implements ApiProvider {
       Date.now() - (performanceTrace.tts + performanceTrace.ttf);
 
     // Some providers wrap the response in a `data` field
-    const response = (message as any).data && !(message as any).choices
-      ? (message as any).data
-      : message;
+    const response =
+      (message as any).data && !(message as any).choices
+        ? (message as any).data
+        : message;
     const choice = response.choices[0];
     if (!choice) {
       throw new Error('OpenAI response did not include any choices');
@@ -987,7 +989,12 @@ export class OpenAIChatCompletionProvider implements ApiProvider {
     const { content, tool_calls } = raw;
     const thinkingOutputState: OpenRouterThinkingOutputState = {};
 
-    yield* this.extractThinkingParts(raw, 'full', undefined, thinkingOutputState);
+    yield* this.extractThinkingParts(
+      raw,
+      'full',
+      undefined,
+      thinkingOutputState,
+    );
 
     if (content) {
       for (const segment of parseThinkingTags(content)) {
@@ -1092,8 +1099,7 @@ export class OpenAIChatCompletionProvider implements ApiProvider {
     const prefix =
       state.lastType !== undefined && state.lastType !== type ? '\n' : '';
     const output =
-      prefix +
-      (type === 'encrypted' ? ENCRYPTED_THINKING_PLACEHOLDER : text);
+      prefix + (type === 'encrypted' ? ENCRYPTED_THINKING_PLACEHOLDER : text);
 
     if (emitMode !== 'metadata-only') {
       yield new vscode.LanguageModelThinkingPart(output);
@@ -1205,9 +1211,10 @@ export class OpenAIChatCompletionProvider implements ApiProvider {
 
       logger.providerResponseChunk(JSON.stringify(event));
       // Some providers may wrap chunks in a `data` field
-      const chunk = (event as any).data && !(event as any).choices
-        ? (event as any).data
-        : event;
+      const chunk =
+        (event as any).data && !(event as any).choices
+          ? (event as any).data
+          : event;
 
       snapshot = this.accumulateChatCompletion(snapshot, chunk);
       if (chunk.usage) usage = chunk.usage;
@@ -1537,7 +1544,11 @@ export class OpenAIChatCompletionProvider implements ApiProvider {
         headers: this.buildHeaders(credential),
       });
       for await (const model of page) {
-        result.push({ id: model.id });
+        const name = model.name?.trim();
+        result.push({
+          id: model.id,
+          ...(name ? { name } : {}),
+        });
       }
       return result;
     } catch (error) {

@@ -27,6 +27,8 @@ export async function showImportReviewPicker(options: {
     const qp = vscode.window.createQuickPick<ImportReviewItem>();
     qp.title = options.title;
     qp.placeholder = options.placeholder;
+    qp.matchOnDescription = true;
+    qp.matchOnDetail = true;
     qp.canSelectMany = true;
     qp.ignoreFocusOut = true;
     qp.buttons = [vscode.QuickInputButtons.Back];

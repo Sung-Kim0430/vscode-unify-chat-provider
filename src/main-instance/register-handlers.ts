@@ -25,9 +25,7 @@ import { PROVIDER_TYPES, type ProviderType } from '../client/definitions';
 import type { ModelConfig, TimeoutConfig } from '../types';
 import type { RetryConfig } from '../utils';
 
-type OAuthWaitResult =
-  | { type: 'success'; url: string }
-  | { type: 'cancel' };
+type OAuthWaitResult = { type: 'success'; url: string } | { type: 'cancel' };
 
 type BalanceRefreshReason =
   | 'periodic'
@@ -88,31 +86,35 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
-function requireRecord(value: unknown, method: string): Record<string, unknown> {
+function requireRecord(
+  value: unknown,
+  method: string,
+): Record<string, unknown> {
   if (!isRecord(value)) {
-    throw new MainInstanceError('BAD_REQUEST', `${method}: params must be an object`);
+    throw new MainInstanceError(
+      'BAD_REQUEST',
+      `${method}: params must be an object`,
+    );
   }
   return value;
 }
 
-function requireString(
-  value: unknown,
-  method: string,
-  field: string,
-): string {
+function requireString(value: unknown, method: string, field: string): string {
   if (typeof value !== 'string' || value.trim() === '') {
-    throw new MainInstanceError('BAD_REQUEST', `${method}: "${field}" must be a non-empty string`);
+    throw new MainInstanceError(
+      'BAD_REQUEST',
+      `${method}: "${field}" must be a non-empty string`,
+    );
   }
   return value;
 }
 
-function requireNumber(
-  value: unknown,
-  method: string,
-  field: string,
-): number {
+function requireNumber(value: unknown, method: string, field: string): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
-    throw new MainInstanceError('BAD_REQUEST', `${method}: "${field}" must be a finite number`);
+    throw new MainInstanceError(
+      'BAD_REQUEST',
+      `${method}: "${field}" must be a finite number`,
+    );
   }
   return value;
 }
@@ -123,7 +125,10 @@ function requireStringArray(
   field: string,
 ): string[] {
   if (!Array.isArray(value)) {
-    throw new MainInstanceError('BAD_REQUEST', `${method}: "${field}" must be an array`);
+    throw new MainInstanceError(
+      'BAD_REQUEST',
+      `${method}: "${field}" must be an array`,
+    );
   }
 
   const out: string[] = [];
@@ -159,14 +164,24 @@ function parseTimeoutConfig(value: unknown): TimeoutConfig | undefined {
   const response = value['response'];
   const out: TimeoutConfig = {};
 
-  if (typeof connection === 'number' && Number.isFinite(connection) && connection >= 0) {
+  if (
+    typeof connection === 'number' &&
+    Number.isFinite(connection) &&
+    connection >= 0
+  ) {
     out.connection = connection;
   }
-  if (typeof response === 'number' && Number.isFinite(response) && response >= 0) {
+  if (
+    typeof response === 'number' &&
+    Number.isFinite(response) &&
+    response >= 0
+  ) {
     out.response = response;
   }
 
-  return out.connection === undefined && out.response === undefined ? undefined : out;
+  return out.connection === undefined && out.response === undefined
+    ? undefined
+    : out;
 }
 
 function parseRetryConfig(value: unknown): RetryConfig | undefined {
@@ -181,7 +196,11 @@ function parseRetryConfig(value: unknown): RetryConfig | undefined {
   const backoffMultiplier = value['backoffMultiplier'];
   const jitterFactor = value['jitterFactor'];
 
-  if (typeof maxRetries === 'number' && Number.isFinite(maxRetries) && maxRetries >= 0) {
+  if (
+    typeof maxRetries === 'number' &&
+    Number.isFinite(maxRetries) &&
+    maxRetries >= 0
+  ) {
     out.maxRetries = maxRetries;
   }
   if (
@@ -191,7 +210,11 @@ function parseRetryConfig(value: unknown): RetryConfig | undefined {
   ) {
     out.initialDelayMs = initialDelayMs;
   }
-  if (typeof maxDelayMs === 'number' && Number.isFinite(maxDelayMs) && maxDelayMs >= 0) {
+  if (
+    typeof maxDelayMs === 'number' &&
+    Number.isFinite(maxDelayMs) &&
+    maxDelayMs >= 0
+  ) {
     out.maxDelayMs = maxDelayMs;
   }
   if (
@@ -201,14 +224,20 @@ function parseRetryConfig(value: unknown): RetryConfig | undefined {
   ) {
     out.backoffMultiplier = backoffMultiplier;
   }
-  if (typeof jitterFactor === 'number' && Number.isFinite(jitterFactor) && jitterFactor >= 0) {
+  if (
+    typeof jitterFactor === 'number' &&
+    Number.isFinite(jitterFactor) &&
+    jitterFactor >= 0
+  ) {
     out.jitterFactor = jitterFactor;
   }
 
   return Object.keys(out).length === 0 ? undefined : out;
 }
 
-function parseContextCacheConfig(value: unknown): ContextCacheConfig | undefined {
+function parseContextCacheConfig(
+  value: unknown,
+): ContextCacheConfig | undefined {
   if (!isRecord(value)) {
     return undefined;
   }
@@ -225,6 +254,34 @@ function parseContextCacheConfig(value: unknown): ContextCacheConfig | undefined
   }
 
   return out.type === undefined && out.ttl === undefined ? undefined : out;
+}
+
+function parseTransportMode(
+  value: unknown,
+): ProviderConfig['transport'] | undefined {
+  switch (value) {
+    case 'auto':
+    case 'sse':
+    case 'websocket':
+      return value;
+    default:
+      return undefined;
+  }
+}
+
+function parseServiceTier(
+  value: unknown,
+): ProviderConfig['serviceTier'] | undefined {
+  switch (value) {
+    case 'auto':
+    case 'standard':
+    case 'flex':
+    case 'scale':
+    case 'priority':
+      return value;
+    default:
+      return undefined;
+  }
 }
 
 function parseStringRecord(value: unknown): Record<string, string> | undefined {
@@ -294,7 +351,10 @@ function parseProviderConfig(value: unknown, method: string): ProviderConfig {
 
   const typeRaw = record['type'];
   if (!isProviderType(typeRaw)) {
-    throw new MainInstanceError('BAD_REQUEST', `${method}: invalid provider.type`);
+    throw new MainInstanceError(
+      'BAD_REQUEST',
+      `${method}: invalid provider.type`,
+    );
   }
 
   const name = requireString(record['name'], method, 'provider.name');
@@ -311,6 +371,8 @@ function parseProviderConfig(value: unknown, method: string): ProviderConfig {
     typeof record['balanceProvider']['method'] === 'string'
       ? (record['balanceProvider'] as unknown as BalanceConfig)
       : undefined;
+  const transport = parseTransportMode(record['transport']);
+  const serviceTier = parseServiceTier(record['serviceTier']);
   const extraHeaders = parseStringRecord(record['extraHeaders']);
   const timeout = parseTimeoutConfig(record['timeout']);
   const retry = parseRetryConfig(record['retry']);
@@ -321,10 +383,14 @@ function parseProviderConfig(value: unknown, method: string): ProviderConfig {
     name,
     baseUrl,
     models: parseModels(record['models']),
+    ...(transport ? { transport } : {}),
+    ...(serviceTier ? { serviceTier } : {}),
     ...(auth ? { auth } : {}),
     ...(balanceProvider ? { balanceProvider } : {}),
     ...(extraHeaders ? { extraHeaders } : {}),
-    ...(isRecord(record['extraBody']) ? { extraBody: record['extraBody'] as Record<string, unknown> } : {}),
+    ...(isRecord(record['extraBody'])
+      ? { extraBody: record['extraBody'] as Record<string, unknown> }
+      : {}),
     ...(timeout ? { timeout } : {}),
     ...(retry ? { retry } : {}),
     ...(typeof record['autoFetchOfficialModels'] === 'boolean'
@@ -339,7 +405,9 @@ function parseOptionalString(value: unknown): string | undefined {
 }
 
 function parseOptionalFiniteNumber(value: unknown): number | undefined {
-  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+  return typeof value === 'number' && Number.isFinite(value)
+    ? value
+    : undefined;
 }
 
 function parseAuthConfig(value: unknown, method: string): AuthConfig {
@@ -520,10 +588,7 @@ function isSuccessfulOAuthCallback(url: URL): boolean {
   return !!code && !!state;
 }
 
-function respondWithOAuthCallbackHtml(
-  res: ServerResponse,
-  url: URL,
-): void {
+function respondWithOAuthCallbackHtml(res: ServerResponse, url: URL): void {
   const success = isSuccessfulOAuthCallback(url);
   res.statusCode = success ? 200 : 400;
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -538,7 +603,10 @@ function respondWithOAuthCallbackHtml(
 
 class OAuthUriWaitRegistry {
   private readonly waitersByState = new Map<string, UriWaiter>();
-  private readonly bufferedCallbacksByState = new Map<string, BufferedUriCallback>();
+  private readonly bufferedCallbacksByState = new Map<
+    string,
+    BufferedUriCallback
+  >();
 
   notify(uriString: string): void {
     const uri = parseUrlOrNull(uriString);
@@ -678,10 +746,16 @@ class OAuthHttpSessionRegistry {
     const redirectPath = params.redirectPath;
 
     if (!Number.isInteger(port) || port < 0 || port > 65535) {
-      throw new MainInstanceError('BAD_REQUEST', 'oauth.http.start: invalid port');
+      throw new MainInstanceError(
+        'BAD_REQUEST',
+        'oauth.http.start: invalid port',
+      );
     }
     if (!redirectPath.startsWith('/')) {
-      throw new MainInstanceError('BAD_REQUEST', 'oauth.http.start: redirectPath must start with "/"');
+      throw new MainInstanceError(
+        'BAD_REQUEST',
+        'oauth.http.start: redirectPath must start with "/"',
+      );
     }
 
     if (port === 0) {
@@ -719,7 +793,9 @@ class OAuthHttpSessionRegistry {
       });
     });
 
-    const tryListen = async (host: string): Promise<{ origin: string } | null> => {
+    const tryListen = async (
+      host: string,
+    ): Promise<{ origin: string } | null> => {
       try {
         await new Promise<void>((resolve, reject) => {
           const onError = (error: unknown): void => {
@@ -749,11 +825,13 @@ class OAuthHttpSessionRegistry {
       }
     };
 
-    const listener =
-      (await tryListen('127.0.0.1')) ?? (await tryListen('::1'));
+    const listener = (await tryListen('127.0.0.1')) ?? (await tryListen('::1'));
     if (!listener) {
       server.close();
-      throw new MainInstanceError('PORT_IN_USE', 'Failed to start OAuth callback server');
+      throw new MainInstanceError(
+        'PORT_IN_USE',
+        'Failed to start OAuth callback server',
+      );
     }
 
     origin = listener.origin;
@@ -770,7 +848,9 @@ class OAuthHttpSessionRegistry {
 
     server.on('error', (error) => {
       this.sessionsById.delete(sessionId);
-      deferred.reject(error instanceof Error ? error : new Error(String(error)));
+      deferred.reject(
+        error instanceof Error ? error : new Error(String(error)),
+      );
     });
 
     return { sessionId, redirectUri };
@@ -817,7 +897,9 @@ class OAuthHttpSessionRegistry {
 
           res.statusCode = 200;
           res.setHeader('Content-Type', 'text/html; charset=utf-8');
-          res.end(renderHtml('Authentication cancelled. You may close this tab.'));
+          res.end(
+            renderHtml('Authentication cancelled. You may close this tab.'),
+          );
 
           this.finishFixedSession({
             key,
@@ -910,7 +992,10 @@ class OAuthHttpSessionRegistry {
   async wait(sessionId: string, signal: AbortSignal): Promise<OAuthWaitResult> {
     const session = this.sessionsById.get(sessionId);
     if (!session) {
-      throw new MainInstanceError('BAD_REQUEST', 'oauth.http.wait: unknown sessionId');
+      throw new MainInstanceError(
+        'BAD_REQUEST',
+        'oauth.http.wait: unknown sessionId',
+      );
     }
 
     const onAbort = (): void => {
@@ -1047,7 +1132,9 @@ export function registerMainInstanceHandlers(options: {
     );
     const expectedStateRaw = p['expectedState'];
     const expectedState =
-      typeof expectedStateRaw === 'string' ? expectedStateRaw.trim() : undefined;
+      typeof expectedStateRaw === 'string'
+        ? expectedStateRaw.trim()
+        : undefined;
 
     return await httpRegistry.start({ port, redirectPath, expectedState });
   });
@@ -1113,50 +1200,60 @@ export function registerMainInstanceHandlers(options: {
     return { ok, lastError: errorSnapshot };
   });
 
-  mainInstance.registerHandler('auth.syncPersistedAuthConfig', async (params) => {
-    const p = requireRecord(params, 'auth.syncPersistedAuthConfig');
-    const providerName = requireString(
-      p['providerName'],
-      'auth.syncPersistedAuthConfig',
-      'providerName',
-    );
-    const authConfig = parseAuthConfig(
-      p['authConfig'],
-      'auth.syncPersistedAuthConfig',
-    );
-    await options.authManager.syncPersistedAuthConfig(providerName, authConfig);
-    return { ok: true };
-  });
-
-  mainInstance.registerHandler('config.syncPersistedProvider', async (params) => {
-    const p = requireRecord(params, 'config.syncPersistedProvider');
-    const provider = parseProviderConfig(
-      p['provider'],
-      'config.syncPersistedProvider',
-    );
-    const originalNameValue = p['originalName'];
-    if (
-      originalNameValue !== undefined &&
-      (typeof originalNameValue !== 'string' || originalNameValue.trim() === '')
-    ) {
-      throw new MainInstanceError(
-        'BAD_REQUEST',
-        'config.syncPersistedProvider: "originalName" must be a non-empty string',
+  mainInstance.registerHandler(
+    'auth.syncPersistedAuthConfig',
+    async (params) => {
+      const p = requireRecord(params, 'auth.syncPersistedAuthConfig');
+      const providerName = requireString(
+        p['providerName'],
+        'auth.syncPersistedAuthConfig',
+        'providerName',
       );
-    }
-    if (typeof originalNameValue === 'string') {
-      options.authManager.clearProvider(originalNameValue);
-    }
-    options.authManager.clearProvider(provider.name);
-    if (
-      typeof originalNameValue === 'string' &&
-      originalNameValue !== provider.name
-    ) {
-      await options.configStore.removeProvider(originalNameValue);
-    }
-    await options.configStore.upsertProvider(provider);
-    return { ok: true };
-  });
+      const authConfig = parseAuthConfig(
+        p['authConfig'],
+        'auth.syncPersistedAuthConfig',
+      );
+      await options.authManager.syncPersistedAuthConfig(
+        providerName,
+        authConfig,
+      );
+      return { ok: true };
+    },
+  );
+
+  mainInstance.registerHandler(
+    'config.syncPersistedProvider',
+    async (params) => {
+      const p = requireRecord(params, 'config.syncPersistedProvider');
+      const provider = parseProviderConfig(
+        p['provider'],
+        'config.syncPersistedProvider',
+      );
+      const originalNameValue = p['originalName'];
+      if (
+        originalNameValue !== undefined &&
+        (typeof originalNameValue !== 'string' ||
+          originalNameValue.trim() === '')
+      ) {
+        throw new MainInstanceError(
+          'BAD_REQUEST',
+          'config.syncPersistedProvider: "originalName" must be a non-empty string',
+        );
+      }
+      if (typeof originalNameValue === 'string') {
+        options.authManager.clearProvider(originalNameValue);
+      }
+      options.authManager.clearProvider(provider.name);
+      if (
+        typeof originalNameValue === 'string' &&
+        originalNameValue !== provider.name
+      ) {
+        await options.configStore.removeProvider(originalNameValue);
+      }
+      await options.configStore.upsertProvider(provider);
+      return { ok: true };
+    },
+  );
 
   mainInstance.registerHandler('balance.forceRefresh', async (params) => {
     const p = requireRecord(params, 'balance.forceRefresh');
@@ -1200,74 +1297,88 @@ export function registerMainInstanceHandlers(options: {
     return { ok: true };
   });
 
-  mainInstance.registerHandler('balance.notifyChatRequestStarted', async (params) => {
-    const p = requireRecord(params, 'balance.notifyChatRequestStarted');
-    const providerName = requireString(
-      p['providerName'],
-      'balance.notifyChatRequestStarted',
-      'providerName',
-    );
-    options.balanceManager.notifyChatRequestStarted(providerName);
-    return { ok: true };
-  });
-
-  mainInstance.registerHandler('balance.notifyChatRequestFinished', async (params) => {
-    const p = requireRecord(params, 'balance.notifyChatRequestFinished');
-    const providerName = requireString(
-      p['providerName'],
-      'balance.notifyChatRequestFinished',
-      'providerName',
-    );
-    const outcome = parseChatOutcome(p['outcome']);
-    if (!outcome) {
-      throw new MainInstanceError(
-        'BAD_REQUEST',
-        'balance.notifyChatRequestFinished: invalid outcome',
+  mainInstance.registerHandler(
+    'balance.notifyChatRequestStarted',
+    async (params) => {
+      const p = requireRecord(params, 'balance.notifyChatRequestStarted');
+      const providerName = requireString(
+        p['providerName'],
+        'balance.notifyChatRequestStarted',
+        'providerName',
       );
-    }
-    options.balanceManager.notifyChatRequestFinished(providerName, outcome);
-    return { ok: true };
-  });
+      options.balanceManager.notifyChatRequestStarted(providerName);
+      return { ok: true };
+    },
+  );
+
+  mainInstance.registerHandler(
+    'balance.notifyChatRequestFinished',
+    async (params) => {
+      const p = requireRecord(params, 'balance.notifyChatRequestFinished');
+      const providerName = requireString(
+        p['providerName'],
+        'balance.notifyChatRequestFinished',
+        'providerName',
+      );
+      const outcome = parseChatOutcome(p['outcome']);
+      if (!outcome) {
+        throw new MainInstanceError(
+          'BAD_REQUEST',
+          'balance.notifyChatRequestFinished: invalid outcome',
+        );
+      }
+      options.balanceManager.notifyChatRequestFinished(providerName, outcome);
+      return { ok: true };
+    },
+  );
 
   mainInstance.registerHandler('balance.getSnapshot', async () => {
     return options.balanceManager.getSnapshotForFollowers();
   });
 
-  mainInstance.registerHandler('officialModels.getOfficialModels', async (params) => {
-    const p = requireRecord(params, 'officialModels.getOfficialModels');
-    const forceFetch = optionalBoolean(p['forceFetch']) ?? false;
-    const providerName = requireString(
-      p['providerName'],
-      'officialModels.getOfficialModels',
-      'providerName',
-    );
-    const provider = options.configStore.getProvider(providerName);
-    if (!provider) {
-      return { models: [], state: undefined };
-    }
+  mainInstance.registerHandler(
+    'officialModels.getOfficialModels',
+    async (params) => {
+      const p = requireRecord(params, 'officialModels.getOfficialModels');
+      const forceFetch = optionalBoolean(p['forceFetch']) ?? false;
+      const providerName = requireString(
+        p['providerName'],
+        'officialModels.getOfficialModels',
+        'providerName',
+      );
+      const provider = options.configStore.getProvider(providerName);
+      if (!provider) {
+        return { models: [], state: undefined };
+      }
 
-    const models = await options.officialModelsManager.getOfficialModels(
-      provider,
-      forceFetch,
-    );
-    const state = options.officialModelsManager.getProviderState(provider.name);
-    return { models, state };
-  });
+      const models = await options.officialModelsManager.getOfficialModels(
+        provider,
+        forceFetch,
+      );
+      const state = options.officialModelsManager.getProviderState(
+        provider.name,
+      );
+      return { models, state };
+    },
+  );
 
-  mainInstance.registerHandler('officialModels.triggerBackgroundFetch', async (params) => {
-    const p = requireRecord(params, 'officialModels.triggerBackgroundFetch');
-    const providerName = requireString(
-      p['providerName'],
-      'officialModels.triggerBackgroundFetch',
-      'providerName',
-    );
-    const provider = options.configStore.getProvider(providerName);
-    if (!provider) {
-      return { ok: false };
-    }
-    options.officialModelsManager.triggerBackgroundFetch(provider);
-    return { ok: true };
-  });
+  mainInstance.registerHandler(
+    'officialModels.triggerBackgroundFetch',
+    async (params) => {
+      const p = requireRecord(params, 'officialModels.triggerBackgroundFetch');
+      const providerName = requireString(
+        p['providerName'],
+        'officialModels.triggerBackgroundFetch',
+        'providerName',
+      );
+      const provider = options.configStore.getProvider(providerName);
+      if (!provider) {
+        return { ok: false };
+      }
+      options.officialModelsManager.triggerBackgroundFetch(provider);
+      return { ok: true };
+    },
+  );
 
   mainInstance.registerHandler('officialModels.refreshAll', async (params) => {
     const p = requireRecord(params, 'officialModels.refreshAll');
@@ -1288,33 +1399,39 @@ export function registerMainInstanceHandlers(options: {
     return { count };
   });
 
-  mainInstance.registerHandler('officialModels.clearProviderState', async (params) => {
-    const p = requireRecord(params, 'officialModels.clearProviderState');
-    const providerName = requireString(
-      p['providerName'],
-      'officialModels.clearProviderState',
-      'providerName',
-    );
-    await options.officialModelsManager.clearProviderState(providerName);
-    return { ok: true };
-  });
+  mainInstance.registerHandler(
+    'officialModels.clearProviderState',
+    async (params) => {
+      const p = requireRecord(params, 'officialModels.clearProviderState');
+      const providerName = requireString(
+        p['providerName'],
+        'officialModels.clearProviderState',
+        'providerName',
+      );
+      await options.officialModelsManager.clearProviderState(providerName);
+      return { ok: true };
+    },
+  );
 
-  mainInstance.registerHandler('officialModels.applyProviderState', async (params) => {
-    const p = requireRecord(params, 'officialModels.applyProviderState');
-    const providerName = requireString(
-      p['providerName'],
-      'officialModels.applyProviderState',
-      'providerName',
-    );
-    const state = parseOfficialModelsFetchState(
-      p['state'],
-      'officialModels.applyProviderState',
-    );
-    return await options.officialModelsManager.applyProviderStateFromSync(
-      providerName,
-      state,
-    );
-  });
+  mainInstance.registerHandler(
+    'officialModels.applyProviderState',
+    async (params) => {
+      const p = requireRecord(params, 'officialModels.applyProviderState');
+      const providerName = requireString(
+        p['providerName'],
+        'officialModels.applyProviderState',
+        'providerName',
+      );
+      const state = parseOfficialModelsFetchState(
+        p['state'],
+        'officialModels.applyProviderState',
+      );
+      return await options.officialModelsManager.applyProviderStateFromSync(
+        providerName,
+        state,
+      );
+    },
+  );
 
   mainInstance.registerHandler('officialModels.getSnapshot', async () => {
     return options.officialModelsManager.getSnapshotForFollowers();

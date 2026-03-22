@@ -484,13 +484,12 @@ const ABORT_LIKE_ERROR_CODES = new Set<string>([
   'UND_ERR_ABORTED',
 ]);
 
-const TIMEOUT_LIKE_ERROR_CODES = new Set<string>([
-  'ETIMEDOUT',
-  'ECONNABORTED',
-  'ESOCKETTIMEDOUT',
-  'UND_ERR_CONNECT_TIMEOUT',
-  'UND_ERR_HEADERS_TIMEOUT',
-  'UND_ERR_BODY_TIMEOUT',
+const GENERIC_ABORT_MESSAGES = new Set<string>([
+  'aborted',
+  'request aborted.',
+  'request was aborted.',
+  'the operation was aborted.',
+  'this operation was aborted',
 ]);
 
 export function createTimeoutError(message: string): Error {
@@ -520,46 +519,75 @@ export function isAbortLikeError(error: unknown): boolean {
   );
 }
 
-export function isTimeoutLikeError(error: unknown): boolean {
-  if (!error) {
-    return false;
-  }
+function toError(error: unknown): Error {
+  return error instanceof Error ? error : new Error(String(error));
+}
 
-  if (error instanceof Error && error.name === 'TimeoutError') {
-    return true;
+function getErrorCause(error: unknown): unknown {
+  if (typeof error !== 'object' || error === null || !('cause' in error)) {
+    return undefined;
   }
+  return (error as { cause: unknown }).cause;
+}
 
-  const code = getErrorCode(error);
-  if (code && TIMEOUT_LIKE_ERROR_CODES.has(code)) {
-    return true;
-  }
+function isGenericAbortMessage(error: Error): boolean {
+  return GENERIC_ABORT_MESSAGES.has(error.message.trim().toLowerCase());
+}
 
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  const message = error.message.toLowerCase();
+function shouldUnwrapMaskedError(error: Error): boolean {
+  const message = error.message.trim().toLowerCase();
   return (
-    (error.name === 'TypeError' && message.includes('terminated')) ||
-    message.includes('timed out') ||
-    message.includes('timeout') ||
-    message.includes('fetch.onaborted')
+    isAbortLikeError(error) ||
+    (error.name === 'TypeError' && message.includes('terminated'))
   );
 }
 
-export function normalizeTimeoutLikeError(
-  error: unknown,
-  timeoutMessage: string,
-): Error {
-  if (error instanceof Error && error.name === 'TimeoutError') {
-    return error;
+function createErrorWithCause(message: string, cause: unknown): Error {
+  const wrapped = new Error(message);
+  if (cause !== undefined) {
+    Object.defineProperty(wrapped, 'cause', {
+      configurable: true,
+      enumerable: false,
+      value: cause,
+      writable: true,
+    });
+  }
+  return wrapped;
+}
+
+export function resolveMeaningfulError(error: unknown): Error {
+  const original = toError(error);
+  let resolved = original;
+  const seen = new Set<unknown>([error, original]);
+
+  while (shouldUnwrapMaskedError(resolved)) {
+    const cause = getErrorCause(resolved);
+    if (cause === undefined || seen.has(cause)) {
+      break;
+    }
+
+    const next = toError(cause);
+    if (
+      next === resolved ||
+      (next.name === resolved.name && next.message === resolved.message)
+    ) {
+      break;
+    }
+
+    seen.add(cause);
+    resolved = next;
   }
 
-  if (!isTimeoutLikeError(error)) {
-    return error instanceof Error ? error : new Error(String(error));
+  if (isAbortLikeError(resolved) && isGenericAbortMessage(resolved)) {
+    return createErrorWithCause(
+      t(
+        'The request was aborted by the provider SDK or transport layer before a specific cause could be recovered. This was not triggered by the user and may indicate a timeout or disconnected stream.',
+      ),
+      original,
+    );
   }
 
-  return createTimeoutError(timeoutMessage);
+  return resolved;
 }
 
 function throwIfAborted(signal: AbortSignal | null | undefined): void {
@@ -924,7 +952,7 @@ export async function fetchWithRetryUsingFetch(
 
   // All retries exhausted
   if (lastError) {
-    throw normalizeTimeoutLikeError(lastError, timeoutMessage);
+    throw resolveMeaningfulError(lastError);
   }
   return lastResponse!;
 }
@@ -999,7 +1027,7 @@ export async function* withIdleTimeout<T>(
           if (abortSignal?.aborted) {
             throw abortReasonToError(abortSignal);
           }
-          throw normalizeTimeoutLikeError(error, timeoutMessage);
+          throw resolveMeaningfulError(error);
         }
 
         if (result.kind === 'abort') {

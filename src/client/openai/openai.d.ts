@@ -1,7 +1,17 @@
+import 'openai/resources/models';
 import 'openai/resources/chat/completions';
 import 'openai/resources/responses/responses';
 import 'openai/lib/ChatCompletionStream';
 import type { ChatCompletionReasoningEffort } from 'openai/resources/chat/completions';
+
+declare module 'openai/resources/models' {
+  interface Model {
+    /**
+     * Optional display name returned by some OpenAI-compatible providers.
+     */
+    name?: string;
+  }
+}
 
 declare module 'openai/resources/chat/completions' {
   /**
