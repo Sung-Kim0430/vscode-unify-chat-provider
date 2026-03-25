@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.8.0 - 2026-03-25
+
+### Features
+- add image retention handling in message sanitization (658bf07, SmallMain)
+- add full support for image content (e5e8bf6, SmallMain)
+
 ## v5.7.0 - 2026-03-25
 
 ### Features
