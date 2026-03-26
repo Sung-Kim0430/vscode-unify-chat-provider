@@ -7,6 +7,7 @@ import {
   resolveTokenCountMultiplier,
   resolveTokenizerId,
 } from './tokenizer/tokenizers';
+import { normalizePresetTemplates } from './preset-templates';
 
 export const MODEL_CONFIG_KEYS = [
   'id',
@@ -31,6 +32,22 @@ export const MODEL_CONFIG_KEYS = [
   'memoryTool',
   'extraHeaders',
   'extraBody',
+  'presetTemplates',
+] as const satisfies ReadonlyArray<keyof ModelConfig>;
+
+export const BUILT_IN_SYNC_MODEL_CONFIG_KEYS = [
+  'maxInputTokens',
+  'maxOutputTokens',
+  'tokenizer',
+  'tokenCountMultiplier',
+  'capabilities',
+  'temperature',
+  'topK',
+  'topP',
+  'frequencyPenalty',
+  'presencePenalty',
+  'parallelToolCalling',
+  'presetTemplates',
 ] as const satisfies ReadonlyArray<keyof ModelConfig>;
 
 export const PROVIDER_CONFIG_KEYS = [
@@ -149,6 +166,7 @@ export function toComparableModelConfig(model: ModelConfig): ModelConfig {
     toolCalling: capabilities.toolCalling ?? false,
     imageInput: capabilities.imageInput ?? false,
   };
+  cloned.presetTemplates = normalizePresetTemplates(cloned.presetTemplates);
 
   return cloned;
 }

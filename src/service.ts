@@ -28,6 +28,10 @@ import { SecretStore } from './secret';
 import { AuthManager } from './auth';
 import type { AuthCredential, AuthTokenInfo } from './auth/types';
 import { t } from './i18n';
+import {
+  applyPresetTemplateSelections,
+  buildPresetTemplateConfigurationSchema,
+} from './preset-templates';
 import { runUiStack } from './ui/router/stack-router';
 import type { UiContext } from './ui/router/types';
 import {
@@ -153,6 +157,7 @@ export class UnifyChatService implements vscode.LanguageModelChatProvider {
       tooltip,
       isUserSelectable: true,
       statusIcon,
+      configurationSchema: buildPresetTemplateConfigurationSchema(model),
     };
   }
 
@@ -443,6 +448,10 @@ export class UnifyChatService implements vscode.LanguageModelChatProvider {
       }
 
       const { provider: resolvedProvider, model: resolvedModel } = resolved;
+      const resolvedRequestModel = applyPresetTemplateSelections(
+        resolvedModel,
+        options.modelConfiguration,
+      );
       providerForBalance = resolvedProvider;
       this.balanceManager?.notifyChatRequestStarted(resolvedProvider.name);
 
@@ -451,8 +460,8 @@ export class UnifyChatService implements vscode.LanguageModelChatProvider {
         providerType: resolvedProvider.type,
         baseUrl: resolvedProvider.baseUrl,
         vscodeModelId: model.id,
-        modelId: resolvedModel.id,
-        modelName: resolvedModel.name,
+        modelId: resolvedRequestModel.id,
+        modelName: resolvedRequestModel.name,
       });
       logger.vscodeInput(messages, options);
 
@@ -478,7 +487,7 @@ export class UnifyChatService implements vscode.LanguageModelChatProvider {
         // Stream the response
         const stream = client.streamChat(
           model.id,
-          resolvedModel,
+          resolvedRequestModel,
           messages,
           options,
           performanceTrace,

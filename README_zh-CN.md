@@ -390,6 +390,12 @@ VS Code 的 Copilot Chat 本身就支持登录 GitHub Copilot 账号，所以一
 
 界面会展示当前供应商的所有配置字段，具体字段说明可查看 [模型参数](#模型参数)。
 
+### 同步内置参数到所有配置
+
+运行 `Unify Chat Provider: 同步内置参数到所有配置`，可将本地模型的参数同步为内置模型参数。
+
+一般用于新版本对内置模型参数进行了优化调整后进行一键同步。
+
 ## 余额监控
 
 可在 `供应商配置` 中启用并查看供应商余额监控。
@@ -495,8 +501,9 @@ VS Code 的 Copilot Chat 本身就支持登录 GitHub Copilot 账号，所以一
 | 推理摘要          | `thinking.summary`         | Responses 风格 API 的推理摘要级别：`auto` / `concise` / `detailed`                                                                                                                                                                                            |
 | 额外 Header       | `extraHeaders`             | 会附加到该模型请求的 HTTP Header（`Record<string, string>`）。                                                                                                                                                                                                |
 | 额外 Body 字段    | `extraBody`                | 会附加到该模型请求 body 的额外字段（`Record<string, unknown>`）。                                                                                                                                                                                             |
+| 预设模板          | `presetTemplates`          | 配置的预设模板可以通过 VS Code 模型二级菜单选择，每个模板对应一组枚举选项，按模板声明顺序依次应用，后面的模板会覆盖前面的同名字段。                                                                                                                           |
 
-### Service Tier 说明
+### 服务层级说明
 
 - 仅当供应商 `baseUrl` 是官方 OpenAI 或 Anthropic 接口时，扩展才会自动发送 `service_tier`。
 - 留空 `serviceTier` 表示不发送 `service_tier` 字段，保持供应商默认行为。
@@ -510,6 +517,10 @@ VS Code 的 Copilot Chat 本身就支持登录 GitHub Copilot 账号，所以一
   - `auto` -> `auto`
   - `standard` / `flex` / `scale` / `priority` -> `standard_only`
 - 对于非官方中转、代理或兼容接口，扩展不会自动注入 `service_tier`，因为不同供应商的语义可能并不一致。
+
+### 预设模板说明
+
+TODO
 
 </details>
 

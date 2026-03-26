@@ -8,6 +8,7 @@ import {
 import { normalizeBaseUrlInput } from './utils';
 import { PROVIDER_KEYS, ProviderType } from './client/definitions';
 import { getRenamedProviderType } from './secret/migration';
+import { normalizePresetTemplates } from './preset-templates';
 import {
   ContextCacheConfig,
   ModelConfig,
@@ -478,6 +479,7 @@ export class ConfigStore {
         model.serviceTier = this.normalizeServiceTier(model.serviceTier);
         model.extraHeaders = this.normalizeStringRecord(model.extraHeaders);
         model.extraBody = this.normalizeObjectRecord(model.extraBody);
+        model.presetTemplates = normalizePresetTemplates(model.presetTemplates);
 
         return model;
       }

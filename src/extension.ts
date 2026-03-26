@@ -32,6 +32,7 @@ import {
 import { registerMainInstanceHandlers } from './main-instance/register-handlers';
 import { authLog } from './logger';
 import { webSocketSessionManager } from './client/websocket-session-manager';
+import { syncBuiltInParamsToAllConfigs } from './sync-built-in-model-params';
 
 const VENDOR_ID = 'unify-chat-provider';
 const CONFIG_NAMESPACE = 'unifyChatProvider';
@@ -398,6 +399,10 @@ export function registerCommands(
           t('Refreshed balances for {0} provider(s).', refreshedCount),
         );
       },
+    ),
+    vscode.commands.registerCommand(
+      'unifyChatProvider.syncBuiltInParamsToAllConfigs',
+      () => syncBuiltInParamsToAllConfigs(configStore),
     ),
   );
 }

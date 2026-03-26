@@ -13,6 +13,13 @@ export interface ContextCacheConfig {
 }
 
 export type ServiceTier = 'auto' | 'standard' | 'flex' | 'scale' | 'priority';
+export type ThinkingEffort =
+  | 'none'
+  | 'minimal'
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'xhigh';
 
 /**
  * Configuration for a single provider endpoint
@@ -133,7 +140,7 @@ export interface ModelConfig {
     /**
      * Thinking effort level. Leave undefined to let the provider decide.
      */
-    effort?: 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh';
+    effort?: ThinkingEffort;
     /**
      * Reasoning summary level for Responses-style APIs.
      * Leave undefined to let the provider decide.
@@ -169,6 +176,43 @@ export interface ModelConfig {
   extraHeaders?: Record<string, string>;
   /** Extra body parameters to include in requests */
   extraBody?: Record<string, unknown>;
+  /** Request-time preset templates exposed to VS Code model configuration UI. */
+  presetTemplates?: PresetTemplate[];
+}
+
+export type PresetTemplateOverrideConfig = Pick<
+  ModelConfig,
+  | 'maxOutputTokens'
+  | 'stream'
+  | 'temperature'
+  | 'topK'
+  | 'topP'
+  | 'frequencyPenalty'
+  | 'presencePenalty'
+  | 'parallelToolCalling'
+  | 'serviceTier'
+  | 'verbosity'
+  | 'thinking'
+  | 'webSearch'
+  | 'memoryTool'
+  | 'extraHeaders'
+  | 'extraBody'
+>;
+
+export type PresetTemplateOverrideKey = keyof PresetTemplateOverrideConfig;
+
+export interface PresetTemplatePreset {
+  id: string;
+  name: string;
+  description?: string;
+  config: PresetTemplateOverrideConfig;
+}
+
+export interface PresetTemplate {
+  id: string;
+  name: string;
+  presets: PresetTemplatePreset[];
+  default: string;
 }
 
 /**

@@ -390,6 +390,12 @@ This feature periodically fetches the latest official model list from the provid
 
 This screen shows all configuration fields for the model. For field details, see [Model Parameters](#model-parameters).
 
+### Sync Built-in Parameters to All Configs
+
+Run `Unify Chat Provider: Sync Built-in Parameters to All Configs` to sync local model parameters with the built-in model parameters.
+
+This is typically used after a new version updates or optimizes built-in model parameters, allowing you to sync existing configs in one click.
+
 ## Balance Monitoring
 
 Use this feature to monitor provider balances in `Provider Settings`.
@@ -495,6 +501,7 @@ The following fields correspond to `ModelConfig` (field names used in import/exp
 | Thinking Summary       | `thinking.summary`         | Reasoning summary level for Responses-style APIs: `auto` / `concise` / `detailed`                                                                                                                                                                                                          |
 | Extra Headers          | `extraHeaders`             | HTTP headers appended to this model request (`Record<string, string>`).                                                                                                                                                                                                                    |
 | Extra Body Fields      | `extraBody`                | Extra fields appended to this model request body (`Record<string, unknown>`).                                                                                                                                                                                                              |
+| Preset Templates       | `presetTemplates`          | Configured preset templates can be selected from the VS Code model configuration submenu. Each template corresponds to one enum option group. Templates are applied in declaration order, and later templates override earlier fields with the same name.                                  |
 
 ### Service Tier Notes
 
@@ -510,6 +517,10 @@ The following fields correspond to `ModelConfig` (field names used in import/exp
   - `auto` -> `auto`
   - `standard` / `flex` / `scale` / `priority` -> `standard_only`
 - For non-official relay, proxy, or compatible endpoints, this extension does not inject `service_tier` automatically because providers may use different semantics.
+
+### Preset Template Notes
+
+TODO
 
 </details>
 

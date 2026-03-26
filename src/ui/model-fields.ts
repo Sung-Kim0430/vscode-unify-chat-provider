@@ -42,6 +42,7 @@ export const modelFormSchema: FormSchema<ModelConfig> = {
     { id: 'parameters', label: t('Parameters') },
     { id: 'tokenization', label: t('Tokenization') },
     { id: 'others', label: t('others') },
+    { id: 'jsonOnly', label: t('JSON-only Fields') },
   ],
   fields: [
     {
@@ -407,8 +408,8 @@ export const modelFormSchema: FormSchema<ModelConfig> = {
                 | undefined;
             }
           >({
-            title: t('Thinking Effort'),
-            placeholder: t('Select thinking effort (optional)'),
+            title: t('Reasoning Effort'),
+            placeholder: t('Select reasoning effort (optional)'),
             items: [
               {
                 label: t('Default'),
@@ -700,7 +701,7 @@ export const modelFormSchema: FormSchema<ModelConfig> = {
       type: 'custom',
       label: t('Extra Headers'),
       icon: 'json',
-      section: 'others',
+      section: 'jsonOnly',
       edit: async () => {
         vscode.window
           .showInformationMessage(
@@ -726,7 +727,7 @@ export const modelFormSchema: FormSchema<ModelConfig> = {
       type: 'custom',
       label: t('Extra Body'),
       icon: 'json',
-      section: 'others',
+      section: 'jsonOnly',
       edit: async () => {
         vscode.window
           .showInformationMessage(
@@ -746,6 +747,33 @@ export const modelFormSchema: FormSchema<ModelConfig> = {
       getDescription: (draft) =>
         draft.extraBody
           ? t('{0} properties', Object.keys(draft.extraBody).length)
+          : t('Not configured'),
+    },
+    {
+      key: 'presetTemplates',
+      type: 'custom',
+      label: t('Preset Templates'),
+      icon: 'settings-gear',
+      section: 'jsonOnly',
+      edit: async () => {
+        vscode.window
+          .showInformationMessage(
+            t(
+              'Preset templates must be configured in VS Code settings (JSON).',
+            ),
+            t('Open Settings'),
+          )
+          .then((choice) => {
+            if (choice === t('Open Settings')) {
+              vscode.commands.executeCommand(
+                'workbench.action.openSettingsJson',
+              );
+            }
+          });
+      },
+      getDescription: (draft) =>
+        draft.presetTemplates
+          ? t('{0} templates', draft.presetTemplates.length)
           : t('Not configured'),
     },
   ],

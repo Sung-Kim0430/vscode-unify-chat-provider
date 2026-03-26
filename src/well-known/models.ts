@@ -1,6 +1,7 @@
 import type { ModelConfig, ProviderConfig } from '../types';
 import type { ProviderPattern } from '../client/types';
 import { matchProvider } from '../client/utils';
+import { reasoningEffort } from './preset-templates';
 
 /**
  * Well-known models configuration
@@ -472,6 +473,7 @@ const _WELL_KNOWN_MODELS = [
       toolCalling: true,
       imageInput: true,
     },
+    presetTemplates: [reasoningEffort()],
   },
   {
     id: 'gpt-5.4-mini',

@@ -23,6 +23,7 @@ import type { ContextCacheConfig, ProviderConfig } from '../types';
 import { mainInstance } from './index';
 import { PROVIDER_TYPES, type ProviderType } from '../client/definitions';
 import type { ModelConfig, TimeoutConfig } from '../types';
+import { normalizePresetTemplates } from '../preset-templates';
 import type { RetryConfig } from '../utils';
 
 type OAuthWaitResult = { type: 'success'; url: string } | { type: 'cancel' };
@@ -342,6 +343,8 @@ function parseModelConfig(value: unknown): ModelConfig | null {
   if (!isRecord(model.extraBody)) {
     delete model.extraBody;
   }
+
+  model.presetTemplates = normalizePresetTemplates(model.presetTemplates);
 
   return model;
 }

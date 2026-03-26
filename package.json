@@ -175,6 +175,10 @@
       {
         "command": "unifyChatProvider.refreshAllProvidersBalance",
         "title": "%command.refreshAllProvidersBalance.title%"
+      },
+      {
+        "command": "unifyChatProvider.syncBuiltInParamsToAllConfigs",
+        "title": "%command.syncBuiltInParamsToAllConfigs.title%"
       }
     ],
     "configuration": {
@@ -978,6 +982,324 @@
                           "type": "object",
                           "description": "%configuration.endpoints.models.extraBody.description%",
                           "additionalProperties": true
+                        },
+                        "presetTemplates": {
+                          "type": "array",
+                          "description": "%configuration.endpoints.models.presetTemplates.description%",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "id",
+                              "name",
+                              "default",
+                              "presets"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "%configuration.endpoints.models.presetTemplates.id.description%"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "%configuration.endpoints.models.presetTemplates.name.description%"
+                              },
+                              "default": {
+                                "type": "string",
+                                "description": "%configuration.endpoints.models.presetTemplates.default.description%"
+                              },
+                              "presets": {
+                                "type": "array",
+                                "description": "%configuration.endpoints.models.presetTemplates.presets.description%",
+                                "items": {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "id",
+                                    "name",
+                                    "config"
+                                  ],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "description": "%configuration.endpoints.models.presetTemplates.presets.id.description%"
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "description": "%configuration.endpoints.models.presetTemplates.presets.name.description%"
+                                    },
+                                    "description": {
+                                      "type": "string",
+                                      "description": "%configuration.endpoints.models.presetTemplates.presets.description.description%"
+                                    },
+                                    "config": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "description": "%configuration.endpoints.models.presetTemplates.presets.config.description%",
+                                      "properties": {
+                                        "maxOutputTokens": {
+                                          "type": "number",
+                                          "description": "%configuration.endpoints.models.maxOutputTokens.description%",
+                                          "default": 8192
+                                        },
+                                        "stream": {
+                                          "type": "boolean",
+                                          "description": "%configuration.endpoints.models.stream.description%"
+                                        },
+                                        "temperature": {
+                                          "type": "number",
+                                          "description": "%configuration.endpoints.models.temperature.description%"
+                                        },
+                                        "topK": {
+                                          "type": "integer",
+                                          "description": "%configuration.endpoints.models.topK.description%"
+                                        },
+                                        "topP": {
+                                          "type": "number",
+                                          "description": "%configuration.endpoints.models.topP.description%"
+                                        },
+                                        "presencePenalty": {
+                                          "type": "number",
+                                          "description": "%configuration.endpoints.models.presencePenalty.description%"
+                                        },
+                                        "frequencyPenalty": {
+                                          "type": "number",
+                                          "description": "%configuration.endpoints.models.frequencyPenalty.description%"
+                                        },
+                                        "parallelToolCalling": {
+                                          "type": "boolean",
+                                          "description": "%configuration.endpoints.models.parallelToolCalling.description%"
+                                        },
+                                        "verbosity": {
+                                          "type": "string",
+                                          "description": "%configuration.endpoints.models.verbosity.description%",
+                                          "enum": [
+                                            "low",
+                                            "medium",
+                                            "high"
+                                          ],
+                                          "enumDescriptions": [
+                                            "%configuration.endpoints.models.verbosity.enumDescriptions.0%",
+                                            "%configuration.endpoints.models.verbosity.enumDescriptions.1%",
+                                            "%configuration.endpoints.models.verbosity.enumDescriptions.2%"
+                                          ]
+                                        },
+                                        "serviceTier": {
+                                          "type": "string",
+                                          "description": "%configuration.endpoints.models.serviceTier.description%",
+                                          "enum": [
+                                            "auto",
+                                            "standard",
+                                            "flex",
+                                            "scale",
+                                            "priority"
+                                          ],
+                                          "enumDescriptions": [
+                                            "%configuration.endpoints.models.serviceTier.enumDescriptions.0%",
+                                            "%configuration.endpoints.models.serviceTier.enumDescriptions.1%",
+                                            "%configuration.endpoints.models.serviceTier.enumDescriptions.2%",
+                                            "%configuration.endpoints.models.serviceTier.enumDescriptions.3%",
+                                            "%configuration.endpoints.models.serviceTier.enumDescriptions.4%"
+                                          ]
+                                        },
+                                        "thinking": {
+                                          "type": "object",
+                                          "description": "%configuration.endpoints.models.thinking.description%",
+                                          "oneOf": [
+                                            {
+                                              "properties": {
+                                                "type": {
+                                                  "const": "enabled",
+                                                  "description": "%configuration.endpoints.models.thinking.enabled.type.description%"
+                                                },
+                                                "budgetTokens": {
+                                                  "type": "integer",
+                                                  "description": "%configuration.endpoints.models.thinking.enabled.budgetTokens.description%"
+                                                },
+                                                "effort": {
+                                                  "type": "string",
+                                                  "description": "%configuration.endpoints.models.thinking.enabled.effort.description%",
+                                                  "enum": [
+                                                    "none",
+                                                    "minimal",
+                                                    "low",
+                                                    "medium",
+                                                    "high",
+                                                    "xhigh"
+                                                  ],
+                                                  "enumDescriptions": [
+                                                    "%configuration.endpoints.models.thinking.enabled.effort.enumDescriptions.0%",
+                                                    "%configuration.endpoints.models.thinking.enabled.effort.enumDescriptions.1%",
+                                                    "%configuration.endpoints.models.thinking.enabled.effort.enumDescriptions.2%",
+                                                    "%configuration.endpoints.models.thinking.enabled.effort.enumDescriptions.3%",
+                                                    "%configuration.endpoints.models.thinking.enabled.effort.enumDescriptions.4%",
+                                                    "%configuration.endpoints.models.thinking.enabled.effort.enumDescriptions.5%"
+                                                  ]
+                                                },
+                                                "summary": {
+                                                  "type": "string",
+                                                  "description": "%configuration.endpoints.models.thinking.enabled.summary.description%",
+                                                  "enum": [
+                                                    "auto",
+                                                    "concise",
+                                                    "detailed"
+                                                  ],
+                                                  "enumDescriptions": [
+                                                    "%configuration.endpoints.models.thinking.enabled.summary.enumDescriptions.0%",
+                                                    "%configuration.endpoints.models.thinking.enabled.summary.enumDescriptions.1%",
+                                                    "%configuration.endpoints.models.thinking.enabled.summary.enumDescriptions.2%"
+                                                  ]
+                                                }
+                                              },
+                                              "required": [
+                                                "type"
+                                              ]
+                                            },
+                                            {
+                                              "properties": {
+                                                "type": {
+                                                  "const": "auto",
+                                                  "description": "%configuration.endpoints.models.thinking.auto.type.description%"
+                                                },
+                                                "budgetTokens": {
+                                                  "type": "integer",
+                                                  "description": "%configuration.endpoints.models.thinking.auto.budgetTokens.description%"
+                                                },
+                                                "effort": {
+                                                  "type": "string",
+                                                  "description": "%configuration.endpoints.models.thinking.auto.effort.description%",
+                                                  "enum": [
+                                                    "none",
+                                                    "minimal",
+                                                    "low",
+                                                    "medium",
+                                                    "high",
+                                                    "xhigh"
+                                                  ],
+                                                  "enumDescriptions": [
+                                                    "%configuration.endpoints.models.thinking.auto.effort.enumDescriptions.0%",
+                                                    "%configuration.endpoints.models.thinking.auto.effort.enumDescriptions.1%",
+                                                    "%configuration.endpoints.models.thinking.auto.effort.enumDescriptions.2%",
+                                                    "%configuration.endpoints.models.thinking.auto.effort.enumDescriptions.3%",
+                                                    "%configuration.endpoints.models.thinking.auto.effort.enumDescriptions.4%",
+                                                    "%configuration.endpoints.models.thinking.auto.effort.enumDescriptions.5%"
+                                                  ]
+                                                },
+                                                "summary": {
+                                                  "type": "string",
+                                                  "description": "%configuration.endpoints.models.thinking.auto.summary.description%",
+                                                  "enum": [
+                                                    "auto",
+                                                    "concise",
+                                                    "detailed"
+                                                  ],
+                                                  "enumDescriptions": [
+                                                    "%configuration.endpoints.models.thinking.auto.summary.enumDescriptions.0%",
+                                                    "%configuration.endpoints.models.thinking.auto.summary.enumDescriptions.1%",
+                                                    "%configuration.endpoints.models.thinking.auto.summary.enumDescriptions.2%"
+                                                  ]
+                                                }
+                                              },
+                                              "required": [
+                                                "type"
+                                              ]
+                                            },
+                                            {
+                                              "properties": {
+                                                "type": {
+                                                  "const": "disabled",
+                                                  "description": "%configuration.endpoints.models.thinking.disabled.type.description%"
+                                                }
+                                              },
+                                              "required": [
+                                                "type"
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        "webSearch": {
+                                          "type": "object",
+                                          "description": "%configuration.endpoints.models.webSearch.description%",
+                                          "properties": {
+                                            "enabled": {
+                                              "type": "boolean",
+                                              "description": "%configuration.endpoints.models.webSearch.enabled.description%"
+                                            },
+                                            "maxUses": {
+                                              "type": "integer",
+                                              "description": "%configuration.endpoints.models.webSearch.maxUses.description%"
+                                            },
+                                            "allowedDomains": {
+                                              "type": "array",
+                                              "description": "%configuration.endpoints.models.webSearch.allowedDomains.description%",
+                                              "items": {
+                                                "type": "string"
+                                              }
+                                            },
+                                            "blockedDomains": {
+                                              "type": "array",
+                                              "description": "%configuration.endpoints.models.webSearch.blockedDomains.description%",
+                                              "items": {
+                                                "type": "string"
+                                              }
+                                            },
+                                            "userLocation": {
+                                              "type": "object",
+                                              "description": "%configuration.endpoints.models.webSearch.userLocation.description%",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "const": "approximate",
+                                                  "description": "%configuration.endpoints.models.webSearch.userLocation.type.description%"
+                                                },
+                                                "city": {
+                                                  "type": "string",
+                                                  "description": "%configuration.endpoints.models.webSearch.userLocation.city.description%"
+                                                },
+                                                "region": {
+                                                  "type": "string",
+                                                  "description": "%configuration.endpoints.models.webSearch.userLocation.region.description%"
+                                                },
+                                                "country": {
+                                                  "type": "string",
+                                                  "description": "%configuration.endpoints.models.webSearch.userLocation.country.description%"
+                                                },
+                                                "timezone": {
+                                                  "type": "string",
+                                                  "description": "%configuration.endpoints.models.webSearch.userLocation.timezone.description%"
+                                                }
+                                              },
+                                              "required": [
+                                                "type"
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        "memoryTool": {
+                                          "type": "boolean",
+                                          "description": "%configuration.endpoints.models.memoryTool.description%"
+                                        },
+                                        "extraHeaders": {
+                                          "type": "object",
+                                          "description": "%configuration.endpoints.models.extraHeaders.description%",
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "extraBody": {
+                                          "type": "object",
+                                          "description": "%configuration.endpoints.models.extraBody.description%",
+                                          "additionalProperties": true
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "minItems": 1
+                              }
+                            }
+                          },
+                          "minItems": 1
                         }
                       }
                     }
