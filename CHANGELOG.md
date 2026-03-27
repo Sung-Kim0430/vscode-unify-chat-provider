@@ -1,5 +1,16 @@
 # Changelog
 
+## v5.10.0 - 2026-03-27
+
+### Features
+- add preset templates support for popular models (a558d18, SmallMain)
+- add bypass for main instance coordination in development mode (ca4ff95, SmallMain)
+
+### Fixes
+- simplify log output channel initialization by removing unnecessary visibility logic (9d6e1ef, SmallMain)
+- update Chinese localization for service tier labels and descriptions (b71b936, SmallMain)
+- update localization and add service tier and verbosity presets (0bc9c8a, SmallMain)
+
 ## v5.9.0 - 2026-03-26
 
 ### Features
