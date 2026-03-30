@@ -446,6 +446,7 @@ export const WELL_KNOWN_PROVIDERS: WellKnownProviderConfig[] = [
     baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
     authTypes: ['api-key'],
     models: [
+      'glm-5.1',
       'glm-5',
       'glm-5-turbo',
       'glm-4.7',
@@ -462,6 +463,7 @@ export const WELL_KNOWN_PROVIDERS: WellKnownProviderConfig[] = [
     baseUrl: 'https://open.bigmodel.cn/api/coding/paas/v4',
     authTypes: ['api-key'],
     models: [
+      'glm-5.1',
       'glm-5',
       'glm-5-turbo',
       'glm-4.7',
@@ -477,6 +479,7 @@ export const WELL_KNOWN_PROVIDERS: WellKnownProviderConfig[] = [
     baseUrl: 'https://api.z.ai/api/paas/v4',
     authTypes: ['api-key'],
     models: [
+      'glm-5.1',
       'glm-5',
       'glm-5-turbo',
       'glm-4.7',
@@ -493,6 +496,7 @@ export const WELL_KNOWN_PROVIDERS: WellKnownProviderConfig[] = [
     baseUrl: 'https://api.z.ai/api/coding/paas/v4',
     authTypes: ['api-key'],
     models: [
+      'glm-5.1',
       'glm-5',
       'glm-5-turbo',
       'glm-4.7',
@@ -595,7 +599,12 @@ export const WELL_KNOWN_PROVIDERS: WellKnownProviderConfig[] = [
     type: 'openai-chat-completion',
     baseUrl: 'https://wanqing.streamlakeapi.com/api/gateway/v1/endpoints',
     authTypes: ['api-key'],
-    models: ['kat-coder-pro-v1', 'kat-coder-exp-72b-1010', 'kat-coder-air-v1'],
+    models: [
+      'kat-coder-pro-v2',
+      'kat-coder-pro-v1',
+      'kat-coder-exp-72b-1010',
+      'kat-coder-air-v1',
+    ],
   },
   {
     name: 'StreamLake Vanchin (China, Coding Plan)',
@@ -604,7 +613,7 @@ export const WELL_KNOWN_PROVIDERS: WellKnownProviderConfig[] = [
     baseUrl:
       'https://wanqing.streamlakeapi.com/api/gateway/coding/kat-coder-pro-v1/claude-code-proxy',
     authTypes: ['api-key'],
-    models: ['kat-coder-pro-v1'],
+    models: ['kat-coder-pro-v2', 'kat-coder-pro-v1'],
   },
   {
     name: 'StreamLake Vanchin (International)',
@@ -612,7 +621,12 @@ export const WELL_KNOWN_PROVIDERS: WellKnownProviderConfig[] = [
     type: 'openai-chat-completion',
     baseUrl: 'https://vanchin.streamlake.ai/api/gateway/v1/endpoints',
     authTypes: ['api-key'],
-    models: ['kat-coder-pro-v1', 'kat-coder-exp-72b-1010', 'kat-coder-air-v1'],
+    models: [
+      'kat-coder-pro-v2',
+      'kat-coder-pro-v1',
+      'kat-coder-exp-72b-1010',
+      'kat-coder-air-v1',
+    ],
   },
   {
     name: 'StreamLake Vanchin (International, Coding Plan)',
@@ -621,7 +635,7 @@ export const WELL_KNOWN_PROVIDERS: WellKnownProviderConfig[] = [
     baseUrl:
       'https://vanchin.streamlake.ai/api/gateway/coding/kat-coder-pro-v1/claude-code-proxy',
     authTypes: ['api-key'],
-    models: ['kat-coder-pro-v1'],
+    models: ['kat-coder-pro-v2', 'kat-coder-pro-v1'],
   },
   {
     name: 'OpenAI Codex (ChatGPT Plus/Pro)',

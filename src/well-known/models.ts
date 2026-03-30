@@ -3355,6 +3355,36 @@ const _WELL_KNOWN_MODELS = [
     },
   },
   {
+    id: 'glm-5.1',
+    overrides: [
+      {
+        matchers: ['integrate.api.nvidia.com'],
+        config: {
+          id: 'z-ai/glm5.1',
+          maxOutputTokens: 32768,
+        },
+      },
+      {
+        matchers: ['api.cline.bot'],
+        config: {
+          id: 'z-ai/glm-5.1',
+        },
+      },
+    ],
+    name: 'GLM-5.1',
+    maxInputTokens: 200000,
+    maxOutputTokens: 128000,
+    stream: true,
+    thinking: {
+      type: 'enabled',
+    },
+    capabilities: {
+      toolCalling: true,
+      imageInput: false,
+    },
+    presetTemplates: [thinkingMode()],
+  },
+  {
     id: 'glm-5',
     overrides: [
       {
@@ -4118,6 +4148,17 @@ const _WELL_KNOWN_MODELS = [
     name: 'LongCat Flash Lite',
     maxInputTokens: 320000,
     maxOutputTokens: 128000,
+    stream: true,
+    capabilities: {
+      toolCalling: true,
+      imageInput: false,
+    },
+  },
+  {
+    id: 'kat-coder-pro-v2',
+    name: 'KAT-Coder-Pro V2',
+    maxInputTokens: 256000,
+    maxOutputTokens: 80000,
     stream: true,
     capabilities: {
       toolCalling: true,
